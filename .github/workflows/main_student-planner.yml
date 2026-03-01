@@ -9,6 +9,9 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       - name: Checkout repository
@@ -24,6 +27,14 @@ jobs:
 
       - name: Build project
         run: npm run build
+
+      # 🔐 Login to Azure (REQUIRED)
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_2E30D07C90654F418DC4F7F0EB941DF6 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_AA06CCDCAA3F45B68DA605D1EF031DC8 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_46D6B98B11974AB29E13741CB7DAD6A2 }}
 
       # 🚀 Deploy ONLY dist folder
       - name: Deploy to Azure Web App
