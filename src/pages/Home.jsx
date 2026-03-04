@@ -20,11 +20,7 @@ import {
 
 const Home = () => {
   const navigate = useNavigate();
-
-  // 🔐 Get logged user
   const user = getUser();
-
-  // ✅ ALL HOOKS MUST BE INSIDE COMPONENT
   const username = user?.name;
 
   const [showUsers, setShowUsers] = useState(false);
@@ -41,7 +37,6 @@ const Home = () => {
     height: window.innerHeight,
   });
 
-  // 🔐 Redirect if not logged in
   useEffect(() => {
     if (!user) {
       navigate("/login");
@@ -50,7 +45,6 @@ const Home = () => {
 
   if (!user) return null;
 
-  // 🎨 Home background
   useEffect(() => {
     document.body.classList.add("home-page");
     document.body.classList.remove("login-page");
@@ -60,12 +54,10 @@ const Home = () => {
     };
   }, []);
 
-  // 💾 Save tasks per user
   useEffect(() => {
     saveTasks(username, tasks);
   }, [tasks, username]);
 
-  // 🌙 Save theme per user
   useEffect(() => {
     const theme = darkMode ? "dark" : "light";
     saveTheme(username, theme);
@@ -77,7 +69,6 @@ const Home = () => {
     }
   }, [darkMode, username]);
 
-  // 🎉 Resize listener
   useEffect(() => {
     const handleResize = () => {
       setWindowSize({

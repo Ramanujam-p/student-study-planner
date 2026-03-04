@@ -8,7 +8,6 @@ body {
   min-height: 100vh;
 }
 
-/* 🌙 TRUE DARK MODE BACKGROUND */
 body.dark-mode {
   background: linear-gradient(135deg, #0f172a, #1e293b);
   color: white;
@@ -167,7 +166,7 @@ body.dark-mode {
   cursor: pointer;
   font-size: 18px;
 }
-/* 🔥 STATS DASHBOARD */
+
 
 .stats-container {
   display: grid;
@@ -200,7 +199,7 @@ body.dark-mode {
   margin-top: 5px;
 }
 
-/* SORT BUTTON */
+
 
 .sort-btn {
   width: 100%;
@@ -252,7 +251,7 @@ body.dark-mode {
   align-items: center;
   margin-bottom: 10px;
 }
-/* ===== LOGIN PAGE STYLING ===== */
+
 
 .login-container {
   width: 380px;
@@ -267,13 +266,13 @@ body.dark-mode {
   overflow: hidden;
 }
 
-/* ✨ Glow effect */
+
 .login-container:hover {
   transform: translateY(-8px) scale(1.02);
   box-shadow: 0 25px 60px rgba(99, 102, 241, 0.5);
 }
 
-/* ✨ Animated border glow */
+
 .login-container::before {
   content: "";
   position: absolute;
@@ -304,7 +303,7 @@ body.dark-mode {
   color: #111827;
 }
 
-/* INPUT FIELD */
+
 .login-container input {
   width: 100%;
   padding: 12px 15px;
@@ -321,7 +320,7 @@ body.dark-mode {
   box-shadow: 0 0 8px rgba(99, 102, 241, 0.4);
 }
 
-/* ===== ATTRACTIVE LOGIN BUTTON ===== */
+
 
 .login-container button {
   position: relative;
@@ -338,7 +337,7 @@ body.dark-mode {
   z-index: 1;
 }
 
-/* BEFORE pseudo element */
+
 .login-container button::before {
   content: "";
   position: absolute;
@@ -356,7 +355,7 @@ body.dark-mode {
   z-index: -1;
 }
 
-/* AFTER pseudo element */
+
 .login-container button::after {
   content: "";
   position: absolute;
@@ -368,7 +367,7 @@ body.dark-mode {
   z-index: -2;
 }
 
-/* Hover Effects */
+
 .login-container button:hover {
   transform: translateY(-3px);
   background: #4f46e5;
@@ -381,9 +380,6 @@ body.dark-mode {
 .login-container button:hover::after {
   opacity: 1;
 }
-/* ============================= */
-/* PREMIUM LOGOUT BUTTON */
-/* ============================= */
 
 .logout-btn {
   position: relative;

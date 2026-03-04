@@ -9,7 +9,7 @@ const Login = () => {
   const [displayText, setDisplayText] = useState("");
   const fullText = "Welcome to Study Planner";
 
-  // 🎨 Set Login Background
+
   useEffect(() => {
     document.body.classList.add("login-page");
     document.body.classList.remove("home-page");
@@ -19,7 +19,6 @@ const Login = () => {
     };
   }, []);
 
-  // ✨ Typing animation
   useEffect(() => {
     let index = 0;
     const interval = setInterval(() => {
@@ -44,7 +43,6 @@ const Login = () => {
 
     loginUser(userObject);
 
-    // ✅ Proper SPA navigation
     navigate("/");
   };
 
