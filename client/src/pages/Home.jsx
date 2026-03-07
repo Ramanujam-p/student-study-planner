@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Confetti from "react-confetti";
+
 import Header from "../components/Header";
+import Footer from "../components/Footer";
+
 import TaskForm from "../components/TaskForm";
 import TaskList from "../components/TaskList";
 import StatsDashboard from "../components/StatsDashboard";
-import {
-  saveTasks,
-  getTasks,
-  saveTheme,
-  getTheme,
-} from "../utils/localStorage";
+
+import API from "../services/api";
+
+import { saveTheme, getTheme } from "../utils/localStorage";
+
 import {
   logoutUser,
   getUser,
@@ -19,19 +21,24 @@ import {
 } from "../utils/auth";
 
 const Home = () => {
+
   const navigate = useNavigate();
+
   const user = getUser();
   const username = user?.name;
 
   const [showUsers, setShowUsers] = useState(false);
-  const [tasks, setTasks] = useState(() =>
-    username ? getTasks(username) : []
-  );
+
+  const [tasks, setTasks] = useState([]);
+
   const [filter, setFilter] = useState("All");
+
   const [subjectFilter, setSubjectFilter] = useState("All");
+
   const [darkMode, setDarkMode] = useState(
     () => username && getTheme(username) === "dark"
   );
+
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -46,20 +53,43 @@ const Home = () => {
   if (!user) return null;
 
   useEffect(() => {
+
     document.body.classList.add("home-page");
     document.body.classList.remove("login-page");
 
     return () => {
       document.body.classList.remove("home-page");
     };
+
+  }, []);
+
+  // LOAD TASKS FROM MONGODB
+  useEffect(() => {
+
+    const fetchTasks = async () => {
+
+      try {
+
+        const res = await API.get("/tasks");
+
+        setTasks(res.data);
+
+      } catch (error) {
+
+        console.error("Error loading tasks");
+
+      }
+
+    };
+
+    fetchTasks();
+
   }, []);
 
   useEffect(() => {
-    saveTasks(username, tasks);
-  }, [tasks, username]);
 
-  useEffect(() => {
     const theme = darkMode ? "dark" : "light";
+
     saveTheme(username, theme);
 
     if (darkMode) {
@@ -67,61 +97,106 @@ const Home = () => {
     } else {
       document.body.classList.remove("dark-mode");
     }
+
   }, [darkMode, username]);
 
   useEffect(() => {
+
     const handleResize = () => {
+
       setWindowSize({
         width: window.innerWidth,
         height: window.innerHeight,
       });
+
     };
 
     window.addEventListener("resize", handleResize);
+
     return () => window.removeEventListener("resize", handleResize);
+
   }, []);
 
   const total = tasks.length;
+
   const completed = tasks.filter((t) => t.completed).length;
 
-  const addTask = (text, subject, deadline) => {
-    const newTask = {
-      id: Date.now(),
-      text,
-      subject,
-      deadline,
-      completed: false,
-    };
-    setTasks((prev) => [...prev, newTask]);
+  // ADD TASK (MongoDB)
+  const addTask = async (text, subject, deadline) => {
+
+    try {
+
+      const res = await API.post("/tasks", {
+        text,
+        subject,
+        deadline
+      });
+
+      setTasks((prev) => [...prev, res.data]);
+
+    } catch (error) {
+
+      console.error("Error adding task");
+
+    }
+
   };
 
-  const toggleTask = (id) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id
-          ? { ...task, completed: !task.completed }
-          : task
-      )
-    );
+  // TOGGLE TASK
+  const toggleTask = async (id) => {
+
+    try {
+
+      const res = await API.put(`/tasks/${id}`);
+
+      setTasks((prev) =>
+        prev.map((task) =>
+          task._id === id ? res.data : task
+        )
+      );
+
+    } catch (error) {
+
+      console.error("Error updating task");
+
+    }
+
   };
 
-  const deleteTask = (id) => {
-    setTasks((prev) =>
-      prev.filter((task) => task.id !== id)
-    );
+  // DELETE TASK
+  const deleteTask = async (id) => {
+
+    try {
+
+      await API.delete(`/tasks/${id}`);
+
+      setTasks((prev) =>
+        prev.filter((task) => task._id !== id)
+      );
+
+    } catch (error) {
+
+      console.error("Error deleting task");
+
+    }
+
   };
 
   const handleLogout = () => {
+
     logoutUser();
     navigate("/login");
+
   };
 
   const users = getAllUsers();
 
   const switchUser = (selectedUser) => {
+
     loginUser(selectedUser);
     navigate("/");
     window.location.reload();
+
   };
 
   let filteredTasks =
@@ -132,13 +207,17 @@ const Home = () => {
       : tasks.filter((t) => !t.completed);
 
   if (subjectFilter !== "All") {
+
     filteredTasks = filteredTasks.filter(
       (t) => t.subject === subjectFilter
     );
+
   }
 
   return (
+
     <div className={darkMode ? "container dark" : "container"}>
+
       {total > 0 && completed === total && (
         <Confetti
           width={windowSize.width}
@@ -149,11 +228,13 @@ const Home = () => {
       <Header />
 
       <div className="top-bar">
+
         <h3>Welcome, {username} 👋</h3>
 
         <div style={{ display: "flex", gap: "10px" }}>
-          {/* Custom Dropdown */}
+
           <div className="user-dropdown">
+
             <button
               className="user-switch-btn"
               onClick={() => setShowUsers(!showUsers)}
@@ -162,8 +243,11 @@ const Home = () => {
             </button>
 
             {showUsers && (
+
               <div className="user-dropdown-menu">
+
                 {users.map((u) => (
+
                   <div
                     key={u.name}
                     className="user-option"
@@ -171,15 +255,24 @@ const Home = () => {
                   >
                     {u.name}
                   </div>
+
                 ))}
+
               </div>
+
             )}
+
           </div>
 
-          <button className="logout-btn" onClick={handleLogout}>
+          <button
+            className="logout-btn"
+            onClick={handleLogout}
+          >
             Logout
           </button>
+
         </div>
+
       </div>
 
       <button
@@ -190,25 +283,41 @@ const Home = () => {
       </button>
 
       <TaskForm addTask={addTask} />
+
       <StatsDashboard tasks={tasks} />
 
       <div className="filter-buttons">
-        <button onClick={() => setFilter("All")}>All</button>
+
+        <button onClick={() => setFilter("All")}>
+          All
+        </button>
+
         <button onClick={() => setFilter("Completed")}>
           Completed
         </button>
+
         <button onClick={() => setFilter("Pending")}>
           Pending
         </button>
+
       </div>
 
       <select
         className="subject-filter"
         value={subjectFilter}
-        onChange={(e) => setSubjectFilter(e.target.value)}
+        onChange={(e) =>
+          setSubjectFilter(e.target.value)
+        }
       >
-        <option value="All">All Subjects</option>
-        <option>Linear Algebra and Numerical Methods</option>
+
+        <option value="All">
+          All Subjects
+        </option>
+
+        <option>
+          Linear Algebra and Numerical Methods
+        </option>
+
         <option>DBMS</option>
         <option>CA</option>
         <option>DAA</option>
@@ -216,6 +325,7 @@ const Home = () => {
         <option>IoT</option>
         <option>Audit Course</option>
         <option>Employability Skills</option>
+
       </select>
 
       <TaskList
@@ -224,8 +334,13 @@ const Home = () => {
         deleteTask={deleteTask}
         setTasks={setTasks}
       />
+
+      <Footer />
+
     </div>
+
   );
+
 };
 
 export default Home;

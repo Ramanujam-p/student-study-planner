@@ -1,34 +1,34 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
-import { setUser, setToken } from "../utils/auth";
 
-const Login = () => {
+const Register = () => {
 
   const navigate = useNavigate();
 
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
 
     e.preventDefault();
 
     try {
 
-      const res = await API.post("/auth/login", {
+      await API.post("/auth/register", {
+        name,
         email,
         password
       });
 
-      setUser(res.data.user);
-      setToken(res.data.token);
+      alert("Registration successful");
 
-      navigate("/dashboard");
+      navigate("/login");
 
     } catch (error) {
 
-      alert("Invalid credentials");
+      alert("Registration failed");
 
     }
 
@@ -40,9 +40,18 @@ const Login = () => {
 
       <div className="login-container">
 
-        <h1>Login</h1>
+        <h1>Register</h1>
 
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleRegister}>
+
+          <input
+            type="text"
+            placeholder="Enter name"
+            value={name}
+            onChange={(e) =>
+              setName(e.target.value)
+            }
+          />
 
           <input
             type="email"
@@ -63,20 +72,10 @@ const Login = () => {
           />
 
           <button type="submit">
-            Login
+            Register
           </button>
 
         </form>
-
-        <p>
-          New user?
-          <span
-            onClick={() => navigate("/register")}
-            style={{ cursor: "pointer", color: "blue" }}
-          >
-            Register
-          </span>
-        </p>
 
       </div>
 
@@ -86,4 +85,4 @@ const Login = () => {
 
 };
 
-export default Login;
+export default Register;
