@@ -1,10 +1,19 @@
 import { motion } from "framer-motion";
 
 const TaskItem = ({ task, toggleTask, deleteTask }) => {
+
   const isOverdue =
     task.deadline &&
     !task.completed &&
     new Date(task.deadline) < new Date();
+
+  const formattedDate = task.deadline
+    ? new Date(task.deadline).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      })
+    : null;
 
   return (
     <motion.li
@@ -16,24 +25,26 @@ const TaskItem = ({ task, toggleTask, deleteTask }) => {
     >
       <div
         className="task-content"
-        onClick={() => toggleTask(task.id)}
+        onClick={() => toggleTask(task._id)}
       >
         <h3 className={task.completed ? "completed" : ""}>
           {task.text}
         </h3>
 
-        <p className="subject">📘 {task.subject}</p>
+        <p className="subject">
+          📘 {task.subject}
+        </p>
 
-        {task.deadline && (
+        {formattedDate && (
           <p className={isOverdue ? "deadline overdue" : "deadline"}>
-            📅 {task.deadline}
+            📅 {formattedDate}
           </p>
         )}
       </div>
 
       <button
         className="delete-btn"
-        onClick={() => deleteTask(task.id)}
+        onClick={() => deleteTask(task._id)}
       >
         ❌
       </button>

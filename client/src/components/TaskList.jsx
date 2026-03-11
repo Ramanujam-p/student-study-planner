@@ -24,8 +24,8 @@ const TaskList = ({ tasks, toggleTask, deleteTask, setTasks }) => {
           >
             {tasks.map((task, index) => (
               <Draggable
-                key={task.id}
-                draggableId={task.id.toString()}
+                key={task._id}
+                draggableId={task._id.toString()}
                 index={index}
               >
                 {(provided) => (

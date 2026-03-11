@@ -13,12 +13,7 @@ import API from "../services/api";
 
 import { saveTheme, getTheme } from "../utils/localStorage";
 
-import {
-  logoutUser,
-  getUser,
-  getAllUsers,
-  loginUser,
-} from "../utils/auth";
+import { logoutUser, getUser } from "../utils/auth";
 
 const Home = () => {
 
@@ -27,17 +22,15 @@ const Home = () => {
   const user = getUser();
   const username = user?.name;
 
-  const [showUsers, setShowUsers] = useState(false);
-
   const [tasks, setTasks] = useState([]);
-
   const [filter, setFilter] = useState("All");
-
   const [subjectFilter, setSubjectFilter] = useState("All");
 
   const [darkMode, setDarkMode] = useState(
     () => username && getTheme(username) === "dark"
   );
+
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
@@ -45,9 +38,7 @@ const Home = () => {
   });
 
   useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
+    if (!user) navigate("/login");
   }, [user, navigate]);
 
   if (!user) return null;
@@ -63,7 +54,7 @@ const Home = () => {
 
   }, []);
 
-  // LOAD TASKS FROM MONGODB
+  // LOAD TASKS
   useEffect(() => {
 
     const fetchTasks = async () => {
@@ -86,6 +77,25 @@ const Home = () => {
 
   }, []);
 
+  // CONFETTI TRIGGER
+  useEffect(() => {
+
+    const total = tasks.length;
+    const completed = tasks.filter((t) => t.completed).length;
+
+    if (total > 0 && completed === total) {
+
+      setShowConfetti(true);
+
+      setTimeout(() => {
+        setShowConfetti(false);
+      }, 5000); // 5 seconds
+
+    }
+
+  }, [tasks]);
+
+  // THEME
   useEffect(() => {
 
     const theme = darkMode ? "dark" : "light";
@@ -100,6 +110,7 @@ const Home = () => {
 
   }, [darkMode, username]);
 
+  // SCREEN SIZE
   useEffect(() => {
 
     const handleResize = () => {
@@ -117,11 +128,7 @@ const Home = () => {
 
   }, []);
 
-  const total = tasks.length;
-
-  const completed = tasks.filter((t) => t.completed).length;
-
-  // ADD TASK (MongoDB)
+  // ADD TASK
   const addTask = async (text, subject, deadline) => {
 
     try {
@@ -189,16 +196,6 @@ const Home = () => {
 
   };
 
-  const users = getAllUsers();
-
-  const switchUser = (selectedUser) => {
-
-    loginUser(selectedUser);
-    navigate("/");
-    window.location.reload();
-
-  };
-
   let filteredTasks =
     filter === "All"
       ? tasks
@@ -218,7 +215,7 @@ const Home = () => {
 
     <div className={darkMode ? "container dark" : "container"}>
 
-      {total > 0 && completed === total && (
+      {showConfetti && (
         <Confetti
           width={windowSize.width}
           height={windowSize.height}
@@ -231,47 +228,12 @@ const Home = () => {
 
         <h3>Welcome, {username} 👋</h3>
 
-        <div style={{ display: "flex", gap: "10px" }}>
-
-          <div className="user-dropdown">
-
-            <button
-              className="user-switch-btn"
-              onClick={() => setShowUsers(!showUsers)}
-            >
-              Switch User
-            </button>
-
-            {showUsers && (
-
-              <div className="user-dropdown-menu">
-
-                {users.map((u) => (
-
-                  <div
-                    key={u.name}
-                    className="user-option"
-                    onClick={() => switchUser(u)}
-                  >
-                    {u.name}
-                  </div>
-
-                ))}
-
-              </div>
-
-            )}
-
-          </div>
-
-          <button
-            className="logout-btn"
-            onClick={handleLogout}
-          >
-            Logout
-          </button>
-
-        </div>
+        <button
+          className="logout-btn"
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
 
       </div>
 
@@ -305,19 +267,12 @@ const Home = () => {
       <select
         className="subject-filter"
         value={subjectFilter}
-        onChange={(e) =>
-          setSubjectFilter(e.target.value)
-        }
+        onChange={(e) => setSubjectFilter(e.target.value)}
       >
 
-        <option value="All">
-          All Subjects
-        </option>
+        <option value="All">All Subjects</option>
 
-        <option>
-          Linear Algebra and Numerical Methods
-        </option>
-
+        <option>Linear Algebra and Numerical Methods</option>
         <option>DBMS</option>
         <option>CA</option>
         <option>DAA</option>

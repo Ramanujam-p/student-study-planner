@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import { setUser, setToken } from "../utils/auth";
@@ -7,16 +7,62 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email,setEmail] = useState("");
+  const [password,setPassword] = useState("");
+  const [error,setError] = useState("");
+  const [loading,setLoading] = useState(false);
+  const [shake,setShake] = useState(false);
 
-  const handleLogin = async (e) => {
+  useEffect(()=>{
+
+    document.body.classList.add("login-page");
+
+    return ()=>{
+      document.body.classList.remove("login-page");
+    }
+
+  },[]);
+
+  useEffect(()=>{
+
+    if(error){
+
+      setShake(true);
+
+      const timer=setTimeout(()=>{
+        setError("");
+        setShake(false);
+      },4000);
+
+      return ()=>clearTimeout(timer);
+
+    }
+
+  },[error]);
+
+  const handleLogin=async(e)=>{
 
     e.preventDefault();
 
-    try {
+    setError("");
 
-      const res = await API.post("/auth/login", {
+    const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if(!email || !password){
+      setError("Please enter email and password");
+      return;
+    }
+
+    if(!emailRegex.test(email)){
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    try{
+
+      setLoading(true);
+
+      const res=await API.post("/auth/login",{
         email,
         password
       });
@@ -26,59 +72,73 @@ const Login = () => {
 
       navigate("/dashboard");
 
-    } catch (error) {
+    }catch(err){
 
-      alert("Invalid credentials");
+  if(err.response && err.response.data.message){
+    setError(err.response.data.message);
+  }
+  else{
+    setError("Invalid email or password");
+  }
 
+  setPassword("");
+}
+    finally{
+      setLoading(false);
     }
 
   };
 
-  return (
+  return(
 
-    <div className="login-wrapper">
+    <div className={`login-container ${shake ? "shake" : ""}`}>
 
-      <div className="login-container">
+      <h1>Login</h1>
 
-        <h1>Login</h1>
+      <form onSubmit={handleLogin} autoComplete="off">
 
-        <form onSubmit={handleLogin}>
+        <input
+          type="email"
+          placeholder="Enter email"
+          value={email}
+          autoComplete="off"
+          onChange={(e)=>setEmail(e.target.value)}
+        />
 
-          <input
-            type="email"
-            placeholder="Enter email"
-            value={email}
-            onChange={(e) =>
-              setEmail(e.target.value)
-            }
-          />
+        <input
+          type="password"
+          placeholder="Enter password"
+          value={password}
+          autoComplete="new-password"
+          onChange={(e)=>setPassword(e.target.value)}
+        />
 
-          <input
-            type="password"
-            placeholder="Enter password"
-            value={password}
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
-          />
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
 
-          <button type="submit">
-            Login
-          </button>
+        {error && (
+          <p className="form-error">{error}</p>
+        )}
 
-        </form>
+      </form>
 
-        <p>
-          New user?
-          <span
-            onClick={() => navigate("/register")}
-            style={{ cursor: "pointer", color: "blue" }}
-          >
-            Register
-          </span>
-        </p>
+      <p className="auth-switch">
+        Don't have an account?
+        <span
+          className="auth-link"
+          onClick={()=>navigate("/register")}
+        >
+          Create account
+        </span>
+      </p>
 
-      </div>
+      <button
+        className="landing-btn"
+        onClick={()=>navigate("/")}
+      >
+        ← Back to Home
+      </button>
 
     </div>
 

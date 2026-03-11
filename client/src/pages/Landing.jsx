@@ -1,16 +1,47 @@
+import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useNavigate } from "react-router-dom";
+
+import { saveTheme, getTheme } from "../utils/localStorage";
+import { getUser } from "../utils/auth";
 
 const Landing = () => {
 
   const navigate = useNavigate();
 
+  const user = getUser();
+  const username = user?.name || "guest";
+
+  const [darkMode,setDarkMode] = useState(
+    () => getTheme(username) === "dark"
+  );
+
+  /* APPLY THEME */
+
+  useEffect(()=>{
+
+    const theme = darkMode ? "dark" : "light";
+
+    saveTheme(username,theme);
+
+    if(darkMode){
+      document.body.classList.add("dark-mode");
+    }else{
+      document.body.classList.remove("dark-mode");
+    }
+
+  },[darkMode,username]);
+
   return (
 
     <div className="landing-container">
 
-      <Navbar />
+      {/* PASS TO NAVBAR */}
+
+      <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
+
+      {/* HERO */}
 
       <section className="hero">
 
@@ -44,6 +75,7 @@ const Landing = () => {
 
       </section>
 
+      {/* FEATURES */}
 
       <section id="features" className="features">
 
@@ -85,10 +117,13 @@ const Landing = () => {
 
       </section>
 
+      {/* CTA */}
 
       <section className="cta">
 
-        <h2>Start Planning Your Success Today</h2>
+        <h2>
+          Start Planning Your Success Today
+        </h2>
 
         <button
           className="primary-btn"
@@ -98,7 +133,6 @@ const Landing = () => {
         </button>
 
       </section>
-
 
       <Footer />
 
