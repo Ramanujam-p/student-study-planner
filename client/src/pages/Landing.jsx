@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +18,8 @@ const Landing = () => {
     () => getTheme(username) === "dark"
   );
 
+  const [showTop,setShowTop] = useState(false);
+
   /* APPLY THEME */
 
   useEffect(()=>{
@@ -33,15 +36,44 @@ const Landing = () => {
 
   },[darkMode,username]);
 
+  /* SHOW BACK TO TOP BUTTON */
+
+  useEffect(()=>{
+
+    const handleScroll = () => {
+
+      if(window.scrollY > 300){
+        setShowTop(true);
+      }else{
+        setShowTop(false);
+      }
+
+    };
+
+    window.addEventListener("scroll",handleScroll);
+
+    return () => window.removeEventListener("scroll",handleScroll);
+
+  },[]);
+
+  /* SCROLL TO TOP */
+
+  const scrollToTop = () => {
+
+    window.scrollTo({
+      top:0,
+      behavior:"smooth"
+    });
+
+  };
+
   return (
 
     <div className="landing-container">
 
-      {/* PASS TO NAVBAR */}
-
       <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
 
-      {/* HERO */}
+      {/* HERO SECTION */}
 
       <section className="hero">
 
@@ -58,14 +90,14 @@ const Landing = () => {
         <div className="hero-buttons">
 
           <button
-            className="primary-btn"
+            className="hero-get-started"
             onClick={() => navigate("/register")}
           >
             Get Started
           </button>
 
           <button
-            className="secondary-btn"
+            className="hero-login"
             onClick={() => navigate("/login")}
           >
             Login
@@ -75,49 +107,74 @@ const Landing = () => {
 
       </section>
 
-      {/* FEATURES */}
+      {/* FEATURES SECTION */}
 
-      <section id="features" className="features">
+      <motion.section
+        id="features"
+        className="features"
+        initial={{ opacity:0, y:40 }}
+        whileInView={{ opacity:1, y:0 }}
+        transition={{ duration:0.6 }}
+        viewport={{ once:true }}
+      >
 
         <h2>Powerful Features</h2>
 
         <div className="feature-grid">
 
-          <div className="feature-card">
+          <motion.div
+            className="feature-card"
+            whileHover={{ scale:1.05 }}
+          >
             📚 Subject Based Planning
-            <p>Organize tasks subject-wise.</p>
-          </div>
+            <p>Organize your study tasks subject-wise.</p>
+          </motion.div>
 
-          <div className="feature-card">
+          <motion.div
+            className="feature-card"
+            whileHover={{ scale:1.05 }}
+          >
             📊 Progress Dashboard
-            <p>Track completed & pending tasks.</p>
-          </div>
+            <p>Track completed and pending tasks visually.</p>
+          </motion.div>
 
-          <div className="feature-card">
-            🎯 Deadline Management
-            <p>Never miss important deadlines.</p>
-          </div>
+          <motion.div
+            className="feature-card"
+            whileHover={{ scale:1.05 }}
+          >
+            🎯 Deadline Tracking
+            <p>Never miss important study deadlines.</p>
+          </motion.div>
 
-          <div className="feature-card">
+          <motion.div
+            className="feature-card"
+            whileHover={{ scale:1.05 }}
+          >
             🌙 Dark Mode
-            <p>Comfortable night studying.</p>
-          </div>
+            <p>Switch between light and dark themes.</p>
+          </motion.div>
 
-          <div className="feature-card">
+          <motion.div
+            className="feature-card"
+            whileHover={{ scale:1.05 }}
+          >
             🧩 Drag & Drop Tasks
-            <p>Rearrange tasks easily.</p>
-          </div>
+            <p>Easily rearrange tasks with drag and drop.</p>
+          </motion.div>
 
-          <div className="feature-card">
-            👥 Multi User Support
-            <p>Switch between multiple users.</p>
-          </div>
+          <motion.div
+            className="feature-card"
+            whileHover={{ scale:1.05 }}
+          >
+            ⚡ Simple Productivity Tool
+            <p>A clean and distraction-free planner for students.</p>
+          </motion.div>
 
         </div>
 
-      </section>
+      </motion.section>
 
-      {/* CTA */}
+      {/* CTA SECTION */}
 
       <section className="cta">
 
@@ -126,7 +183,7 @@ const Landing = () => {
         </h2>
 
         <button
-          className="primary-btn"
+          className="hero-get-started"
           onClick={() => navigate("/register")}
         >
           Create Account
@@ -135,6 +192,17 @@ const Landing = () => {
       </section>
 
       <Footer />
+
+      {/* BACK TO TOP BUTTON */}
+
+      {showTop && (
+        <button
+          className="back-to-top"
+          onClick={scrollToTop}
+        >
+          ↑
+        </button>
+      )}
 
     </div>
 

@@ -41,11 +41,7 @@ const Navbar = () => {
 
       <div className="nav-links">
 
-        <button 
-          onClick={() => navigate("/")}
-        >
-          Home
-        </button>
+        
 
         <button
           onClick={()=>{

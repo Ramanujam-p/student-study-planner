@@ -21,7 +21,7 @@ const Register = () => {
 
     return ()=>{
       document.body.classList.remove("login-page");
-    }
+    };
 
   },[]);
 

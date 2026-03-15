@@ -1,55 +1,153 @@
-import { motion } from "framer-motion";
+import { useState } from "react";
 
-const TaskItem = ({ task, toggleTask, deleteTask }) => {
+const TaskItem = ({ task, toggleTask, deleteTask, editTask }) => {
+
+  const [editing, setEditing] = useState(false);
+  const [newText, setNewText] = useState(task.text);
+
+  const today = new Date();
+
+  const deadlineDate = task.deadline
+    ? new Date(task.deadline)
+    : null;
 
   const isOverdue =
     task.deadline &&
     !task.completed &&
-    new Date(task.deadline) < new Date();
+    deadlineDate < today;
 
-  const formattedDate = task.deadline
-    ? new Date(task.deadline).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric"
-      })
-    : null;
+  const formatDate = (date) => {
+
+    if (!date) return "";
+
+    const d = new Date(date);
+
+    return d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+
+  };
+
+  const handleSave = () => {
+
+    if (!newText.trim()) return;
+
+    editTask(task._id, newText);
+
+    setEditing(false);
+
+  };
+
+  const handleCancel = () => {
+
+    setNewText(task.text);
+
+    setEditing(false);
+
+  };
 
   return (
-    <motion.li
-      className="task-card"
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, x: -50 }}
-      transition={{ duration: 0.3 }}
-    >
-      <div
-        className="task-content"
-        onClick={() => toggleTask(task._id)}
-      >
-        <h3 className={task.completed ? "completed" : ""}>
-          {task.text}
-        </h3>
 
-        <p className="subject">
-          📘 {task.subject}
-        </p>
+    <li className="task-card">
 
-        {formattedDate && (
-          <p className={isOverdue ? "deadline overdue" : "deadline"}>
-            📅 {formattedDate}
-          </p>
-        )}
+      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+
+        {/* CHECKBOX */}
+
+        <input
+          type="checkbox"
+          checked={task.completed}
+          onChange={() => toggleTask(task._id)}
+        />
+
+        <div className="task-content">
+
+          {editing ? (
+
+            <input
+              value={newText}
+              autoFocus
+              onChange={(e) => setNewText(e.target.value)}
+            />
+
+          ) : (
+
+            <div>
+
+              <h3 className={task.completed ? "completed" : ""}>
+                {task.text}
+              </h3>
+
+              <p className="subject">
+                📘 {task.subject}
+              </p>
+
+              {task.priority && (
+                <p>
+                  Priority: {task.priority}
+                </p>
+              )}
+
+              {task.deadline && (
+                <p className={isOverdue ? "overdue" : "deadline"}>
+                  📅 {formatDate(task.deadline)}
+                </p>
+              )}
+
+            </div>
+
+          )}
+
+        </div>
+
       </div>
 
-      <button
-        className="delete-btn"
-        onClick={() => deleteTask(task._id)}
-      >
-        ❌
-      </button>
-    </motion.li>
+      <div className="task-actions">
+
+        {editing ? (
+
+          <>
+            <button
+              className="save-btn"
+              onClick={handleSave}
+            >
+              Save
+            </button>
+
+            <button
+              className="edit-btn"
+              onClick={handleCancel}
+            >
+              Cancel
+            </button>
+          </>
+
+        ) : (
+
+          <button
+            className="edit-btn"
+            onClick={() => setEditing(true)}
+          >
+            ✏️
+          </button>
+
+        )}
+
+        <button
+          className="delete-btn"
+          onClick={() => deleteTask(task._id)}
+        >
+          ❌
+        </button>
+
+      </div>
+
+    </li>
+
   );
+
 };
 
 export default TaskItem;

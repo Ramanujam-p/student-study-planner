@@ -4,8 +4,11 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
-
+import Profile from "./pages/Profile"
+import Subjects from "./pages/Subjects"
 import ProtectedRoute from "./components/ProtectedRoute";
+import CalendarPage from "./pages/Calendar"
+
 
 function App() {
 
@@ -29,7 +32,25 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
 
+        <Route
+          path="/subjects"
+          element={
+            <ProtectedRoute>
+              <Subjects />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="/calendar" element={<ProtectedRoute><CalendarPage/></ProtectedRoute>} />
       </Routes>
 
     </Router>

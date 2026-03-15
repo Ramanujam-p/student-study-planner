@@ -9,6 +9,17 @@ export const getUser = () => {
   return user ? JSON.parse(user) : null;
 };
 
+// UPDATE USER (NEW FUNCTION)
+export const updateUser = (updatedData) => {
+  const currentUser = getUser();
+
+  if (!currentUser) return;
+
+  const newUser = { ...currentUser, ...updatedData };
+
+  localStorage.setItem("user", JSON.stringify(newUser));
+};
+
 // SAVE TOKEN
 export const setToken = (token) => {
   localStorage.setItem("token", token);

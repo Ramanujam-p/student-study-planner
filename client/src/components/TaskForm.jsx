@@ -1,52 +1,76 @@
 import { useState } from "react";
 
-const TaskForm = ({ addTask }) => {
-  const [text, setText] = useState("");
-  const [subject, setSubject] = useState("Linear Algebra and Numerical Methods");
-  const [deadline, setDeadline] = useState("");
+const TaskForm = ({ addTask, subjects }) => {
+
+  const [text,setText] = useState("");
+  const [subject,setSubject] = useState("");
+  const [deadline,setDeadline] = useState("");
+  const [priority,setPriority] = useState("Medium");
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!text.trim()) return;
 
-    addTask(text, subject, deadline);
+    e.preventDefault();
+
+    if(!text || !subject) return;
+
+    addTask(text,subject,deadline,priority);
+
     setText("");
+    setSubject("");
     setDeadline("");
-    setSubject("Linear Algebra and Numerical Methods");
+    setPriority("Medium");
+
   };
 
   return (
-    <form onSubmit={handleSubmit} className="task-form">
+
+    <form className="task-form" onSubmit={handleSubmit}>
+
       <input
         type="text"
-        placeholder="Enter study task..."
+        placeholder="Enter task"
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        onChange={(e)=>setText(e.target.value)}
       />
 
       <select
         value={subject}
-        onChange={(e) => setSubject(e.target.value)}
+        onChange={(e)=>setSubject(e.target.value)}
       >
-        <option>Linear Algebra and Numerical Methods</option>
-        <option>DBMS</option>
-        <option>CA</option>
-        <option>DAA</option>
-        <option>Full Stack</option>
-        <option>IoT</option>
-        <option>Audit Course</option>
-        <option>Employability Skills</option>
+
+        <option value="">Select Subject</option>
+
+        {subjects.map((s,index)=>(
+          <option key={index} value={s}>
+            {s}
+          </option>
+        ))}
+
       </select>
 
       <input
         type="date"
         value={deadline}
-        onChange={(e) => setDeadline(e.target.value)}
+        onChange={(e)=>setDeadline(e.target.value)}
       />
 
-      <button type="submit">Add Task</button>
+      <select
+        value={priority}
+        onChange={(e)=>setPriority(e.target.value)}
+      >
+        <option>Low</option>
+        <option>Medium</option>
+        <option>High</option>
+      </select>
+
+      <button type="submit">
+        Add Task
+      </button>
+
     </form>
+
   );
+
 };
 
 export default TaskForm;

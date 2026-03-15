@@ -20,25 +20,43 @@ res.json(task)
 
 }
 
-exports.updateTask = async (req,res)=>{
-  try{
+exports.updateTask = async (req, res) => {
 
-    const task = await Task.findById(req.params.id)
+  const task = await Task.findById(req.params.id);
 
-    if(!task){
-      return res.status(404).json({message:"Task not found"})
-    }
-
-    task.completed = !task.completed
-
-    await task.save()
-
-    res.json(task)
-
-  }catch(error){
-    res.status(500).json({message:error.message})
+  if (!task) {
+    return res.status(404).json({ message: "Task not found" });
   }
-}
+
+  /* UPDATE TEXT */
+
+  if (req.body.text !== undefined) {
+    task.text = req.body.text;
+  }
+
+  /* UPDATE SUBJECT */
+
+  if (req.body.subject !== undefined) {
+    task.subject = req.body.subject;
+  }
+
+  /* UPDATE DEADLINE */
+
+  if (req.body.deadline !== undefined) {
+    task.deadline = req.body.deadline;
+  }
+
+  /* TOGGLE COMPLETION ONLY WHEN REQUESTED */
+
+  if (req.body.toggleCompleted) {
+    task.completed = !task.completed;
+  }
+
+  await task.save();
+
+  res.json(task);
+
+};
 
 exports.deleteTask = async (req, res) => {
 
